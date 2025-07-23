@@ -1,4 +1,5 @@
 const { DataSource } = require('typeorm');
+const OutboxEvent = require('../entities/OutboxEvent');
 const dotenv = require('dotenv');
 const path = require('path');
 
@@ -19,9 +20,9 @@ const AppDataSource = new DataSource({
   username: DB_USER,
   password: DB_PASS,
   database: DB_NAME,
-  synchronize: false, // Set to true only for dev
+  synchronize: true, // Only use in development
   logging: true,
-  entities: [], // Add entity paths here
+  entities: [require('../entities/OutboxEvent')],
   migrations: [],
   subscribers: [],
 });
