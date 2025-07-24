@@ -1,9 +1,13 @@
-const { DataSource } = require('typeorm');
-const OutboxEvent = require('../entities/OutboxEvent');
-const dotenv = require('dotenv');
-const path = require('path');
+import { DataSource } from 'typeorm';
+import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import OutboxEvent from '../entities/OutboxEvent.js';
 
-dotenv.config({ path: path.resolve(process.cwd(), '.env') });
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 const {
   DB_HOST,
@@ -25,14 +29,14 @@ console.log('📦 Loaded DB ENV:', {
 
 const AppDataSource = new DataSource({
   type: 'postgres',
-  host: DB_HOST || 'localhost',
+  host: DB_HOST,
   port: DB_PORT ? parseInt(DB_PORT, 10) : 5432,
-  username: DB_USER || 'postgres',
-  password: DB_PASS || 'pass',
-  database: DB_NAME || 'notifications',
-  synchronize: true, // Only use in development
+  username: DB_USER,
+  password: DB_PASS,
+  database: DB_NAME,
+  synchronize: false,
   logging: true,
-  entities: [require('../entities/OutboxEvent')],
+  entities: [OutboxEvent],
   migrations: [],
   subscribers: [],
 });
@@ -45,4 +49,4 @@ AppDataSource.initialize()
     console.error('Error during Data Source initialization:', err);
   });
 
-module.exports = { AppDataSource };
+export { AppDataSource };

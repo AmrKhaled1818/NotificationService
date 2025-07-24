@@ -1,11 +1,10 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const notifyRoute = require('./routes/notify');
+import express from 'express';
+import notifyRoute from './routes/notify.js';
 
 const app = express();
 const PORT = process.env.PORT || 4000;
 
-app.use(bodyParser.json());
+app.use(express.json());
 
 // Route: /notify
 app.use('/notify', notifyRoute);

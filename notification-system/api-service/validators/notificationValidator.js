@@ -1,4 +1,4 @@
-const Joi = require('joi');
+import Joi from 'joi';
 
 const notificationSchema = Joi.object({
   recipient: Joi.string().email().required(),
@@ -6,4 +6,4 @@ const notificationSchema = Joi.object({
   message: Joi.string().min(1).required(),
 });
 
-module.exports = notificationSchema;
+export default notificationSchema;

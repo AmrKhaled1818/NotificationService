@@ -1,9 +1,7 @@
-const express = require('express');
-const notificationSchema = require('../validators/notificationValidator');
-const path = require('path');
-const { AppDataSource } = require(path.resolve(__dirname, '../../common/config/typeorm.config'));
-const OutboxEvent = require(path.resolve(__dirname, '../../common/entities/OutboxEvent'));
-
+import express from 'express';
+import notificationSchema from '../validators/notificationValidator.js';
+import { AppDataSource } from '../../common/config/typeorm.config.js';
+import OutboxEvent from '../../common/entities/OutboxEvent.js';
 
 const router = express.Router();
 
@@ -38,4 +36,4 @@ router.post('/', async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;
