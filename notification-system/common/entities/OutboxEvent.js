@@ -1,6 +1,6 @@
-const { EntitySchema } = require('typeorm');
+import { EntitySchema } from 'typeorm';
 
-module.exports = new EntitySchema({
+const OutboxEvent = new EntitySchema({
   name: 'OutboxEvent',
   tableName: 'outbox_event',
   columns: {
@@ -27,4 +27,6 @@ module.exports = new EntitySchema({
       createDate: true,
     },
   },
-}); 
+});
+
+export default OutboxEvent; 
