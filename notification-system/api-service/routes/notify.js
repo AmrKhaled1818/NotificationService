@@ -1,7 +1,7 @@
 import express from 'express';
 import notificationSchema from '../validators/notificationValidator.js';
-import { AppDataSource } from '../../common/config/typeorm.config.js';
-import OutboxEvent from '../../common/entities/OutboxEvent.js';
+import { AppDataSource } from  '../common/config/typeorm.config.js'
+import OutboxEvent from '../common/entities/OutboxEvent.js';
 
 const router = express.Router();
 

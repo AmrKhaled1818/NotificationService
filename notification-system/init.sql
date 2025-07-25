@@ -1,0 +1,10 @@
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+CREATE TABLE IF NOT EXISTS outbox_event (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    recipient VARCHAR(255) NOT NULL,
+    channel VARCHAR(50) NOT NULL,
+    message TEXT NOT NULL,
+    status VARCHAR(20) DEFAULT 'PENDING',
+    "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+); 

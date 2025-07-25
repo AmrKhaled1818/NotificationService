@@ -13,4 +13,4 @@ COPY common/ ./common/
 
 EXPOSE 8081
 
-CMD ["node", "index.js"]
+CMD ["node", "index.js"] 

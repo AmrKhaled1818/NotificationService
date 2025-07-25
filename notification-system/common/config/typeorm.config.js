@@ -7,14 +7,17 @@ import OutboxEvent from '../entities/OutboxEvent.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-dotenv.config({ path: path.resolve(__dirname, '../.env') });
+// Only load .env file if environment variables are not already set
+if (!process.env.DB_HOST) {
+  dotenv.config({ path: path.resolve(__dirname, '../.env') });
+}
 
 const {
-  DB_HOST,
-  DB_PORT,
-  DB_USER,
-  DB_PASS,
-  DB_NAME
+  DB_HOST = 'postgres',
+  DB_PORT = '5432',
+  DB_USER = 'postgres',
+  DB_PASS = 'pass',
+  DB_NAME = 'testdb'
 } = process.env;
 
 console.log('📦 Loaded DB ENV:', {

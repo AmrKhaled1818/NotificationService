@@ -24,22 +24,6 @@ const queueGauge = new client.Gauge({
   help: 'Number of PENDING events in the outbox',
 });
 
-export const totalSentCounter = new client.Counter({
-  name: 'outbox_events_sent_total',
-  help: 'Total number of events sent successfully',
-});
-
-export const failedSentCounter = new client.Counter({
-  name: 'outbox_events_failed_total',
-  help: 'Total number of events that failed to send',
-});
-
-export const queueDepthGauge = new client.Gauge({
-  name: 'outbox_event_queue_depth',
-  help: 'Current number of pending events in outbox',
-});
-
-
 // PostgreSQL setup
 const pool = new pg.Pool({
   user: 'postgres',

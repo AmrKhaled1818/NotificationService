@@ -11,6 +11,13 @@ services:
       - postgres
     environment:
       - NODE_ENV=development
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASS=pass
+      - DB_NAME=testdb
+    restart: unless-stopped
+    
   outbox-worker:
     build:
       context: .
@@ -23,10 +30,19 @@ services:
       - postgres
     environment:
       - NODE_ENV=development
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASS=pass
+      - DB_NAME=testdb
+    restart: unless-stopped
+    
   zookeeper:
     image: wurstmeister/zookeeper
     ports:
       - "2181:2181"
+    restart: unless-stopped
+    
   kafka:
     image: wurstmeister/kafka
     ports:
@@ -37,6 +53,8 @@ services:
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://127.0.0.1:9092
     depends_on:
       - zookeeper
+    restart: unless-stopped
+    
   postgres:
     image: postgres:15
     environment:
@@ -47,6 +65,8 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    
   prometheus:
     image: prom/prometheus
     ports:
@@ -56,14 +76,15 @@ services:
     depends_on:
       - api-service
       - outbox-worker
+    restart: unless-stopped
+    
   grafana:
     image: grafana/grafana
     ports:
       - "3000:3000"
     depends_on:
       - prometheus
+    restart: unless-stopped
 
 volumes:
-  postgres_data:
-
-      
+  postgres_data: 
