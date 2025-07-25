@@ -1,4 +1,4 @@
-import { sendToKafka } from './kafkaProducer.js';
+import { initKafkaProducer, sendToKafka, closeKafkaProducer } from './kafkaProducer.js';
 import { DataSource } from 'typeorm';
 import OutboxEvent from '../common/entities/OutboxEvent.js';
 import dotenv from 'dotenv';
@@ -9,6 +9,9 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.resolve(__dirname, '../common/.env') });
 
+console.log("🌱 Loaded .env from:", path.resolve(__dirname, '../common/.env'));
+
+// Setup TypeORM
 const AppDataSource = new DataSource({
   type: 'postgres',
   host: process.env.DB_HOST,
@@ -21,24 +24,56 @@ const AppDataSource = new DataSource({
   entities: [OutboxEvent],
 });
 
-async function processOutbox() {
+let intervalRef = null;
+
+async function startPolling() {
   await AppDataSource.initialize();
+  await initKafkaProducer();
   const repo = AppDataSource.getRepository(OutboxEvent);
-  // Fetch PENDING events
-  const events = await repo.find({ where: { status: 'PENDING' } });
-  for (const event of events) {
+
+  console.log("⏳ Polling for PENDING outbox events every 5 seconds...");
+
+  intervalRef = setInterval(async () => {
     try {
-      await sendToKafka(event);
-      event.status = 'SENT';
-      await repo.save(event);
-      console.log(`Event ${event.id} sent to Kafka and marked as SENT.`);
-    } catch (err) {
-      event.status = 'RETRY'; // or 'FAILED' for permanent errors
-      await repo.save(event);
-      console.error(`Failed to send event ${event.id}:`, err.message);
+      const pendingEvents = await repo.find({ where: { status: 'PENDING' } });
+
+      if (pendingEvents.length === 0) {
+        console.log("🔍 No new events...");
+        return;
+      }
+
+      for (const event of pendingEvents) {
+        try {
+          await sendToKafka(event);
+          event.status = 'SENT';
+          await repo.save(event);
+          console.log(`✅ Event ${event.id} sent to Kafka and marked as SENT.`);
+        } catch (err) {
+          event.status = 'RETRY';
+          await repo.save(event);
+          console.error(`❌ Failed to send event ${event.id}:`, err.message);
+        }
+      }
+    } catch (error) {
+      console.error("💥 Error during polling:", error.message);
     }
-  }
-  await AppDataSource.destroy();
+  }, 5000);
 }
 
-processOutbox(); 
+async function shutdown() {
+  if (intervalRef) clearInterval(intervalRef);
+  await AppDataSource.destroy();
+  await closeKafkaProducer();
+  console.log("👋 Worker shutdown complete.");
+  process.exit(0);
+}
+
+// Start polling loop
+startPolling().catch((err) => {
+  console.error("💥 Failed to start polling worker:", err);
+  shutdown();
+});
+
+// Graceful shutdown handlers
+process.on('SIGINT', shutdown);
+process.on('SIGTERM', shutdown);
