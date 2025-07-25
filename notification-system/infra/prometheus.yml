@@ -1,0 +1,10 @@
+global:
+  scrape_interval: 5s
+
+scrape_configs:
+  - job_name: "api-service"
+    static_configs:
+      - targets: ["api-service:8080"]
+  - job_name: "outbox-worker"
+    static_configs:
+      - targets: ["outbox-worker:8081"]

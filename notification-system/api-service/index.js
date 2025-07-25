@@ -1,8 +1,16 @@
 import express from 'express';
 import notifyRoute from './routes/notify.js';
+import client from 'prom-client';
 
 const app = express();
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 8080;
+
+client.collectDefaultMetrics();
+
+app.get('/metrics', async (req, res) => {
+  res.set('Content-Type', client.register.contentType);
+  res.end(await client.register.metrics());
+});
 
 app.use(express.json());
 
