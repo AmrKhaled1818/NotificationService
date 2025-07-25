@@ -24,22 +24,6 @@ const queueGauge = new client.Gauge({
   help: 'Number of PENDING events in the outbox',
 });
 
-export const totalSentCounter = new client.Counter({
-  name: 'outbox_events_sent_total',
-  help: 'Total number of events sent successfully',
-});
-
-export const failedSentCounter = new client.Counter({
-  name: 'outbox_events_failed_total',
-  help: 'Total number of events that failed to send',
-});
-
-export const queueDepthGauge = new client.Gauge({
-  name: 'outbox_event_queue_depth',
-  help: 'Current number of pending events in outbox',
-});
-
-
 // PostgreSQL setup
 const pool = new pg.Pool({
   user: 'postgres',
@@ -52,7 +36,8 @@ const pool = new pg.Pool({
 // Kafka setup
 const kafka = new Kafka({
   clientId: 'outbox-worker',
-  brokers: ['kafka:9092'],
+  brokers: ['localhost:9092'],
+
 });
 
 const producer = kafka.producer();
@@ -65,7 +50,7 @@ const pollOutbox = async () => {
     );
 
     const events = res.rows;
-    queueGauge.set(events.length); // Update Prometheus gauge
+    queueGauge.set(events.length);
 
     if (events.length === 0) {
       console.log('🔍 No new events...');
@@ -97,10 +82,10 @@ const pollOutbox = async () => {
           event.id,
         ]);
 
-        sentEmailsCounter.inc(); // increment success
+        sentEmailsCounter.inc();
         console.log(`✅ Event ${event.id} sent to Kafka and marked as SENT`);
       } catch (err) {
-        failedEmailsCounter.inc(); // increment failure
+        failedEmailsCounter.inc();
         console.error(`❌ Failed to send event ${event.id}:`, err.message);
       }
     }
