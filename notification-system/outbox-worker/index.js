@@ -43,8 +43,8 @@ const producer = kafka.producer();
 
 const pollOutbox = async () => {
   try {
-    const client = await pool.connect();
-    const res = await client.query(
+    const dbClient = await pool.connect();
+    const res = await dbClient.query(
       "SELECT * FROM outbox_event WHERE status = 'PENDING' ORDER BY id ASC"
     );
 
@@ -53,7 +53,7 @@ const pollOutbox = async () => {
 
     if (events.length === 0) {
       console.log('🔍 No new events...');
-      client.release();
+      dbClient.release();
       return;
     }
 
@@ -76,7 +76,7 @@ const pollOutbox = async () => {
           ],
         });
 
-        await client.query('UPDATE outbox_event SET status = $1 WHERE id = $2', [
+        await dbClient.query('UPDATE outbox_event SET status = $1 WHERE id = $2', [
           'SENT',
           event.id,
         ]);
@@ -86,10 +86,28 @@ const pollOutbox = async () => {
       } catch (err) {
         failedEmailsCounter.inc(); // increment failure
         console.error(`❌ Failed to send event ${event.id}:`, err.message);
+
+        // ➕ Send to Dead Letter Queue
+        try {
+          await producer.send({
+            topic: 'notification-dead-letter', // ⬅️ fallback topic
+            messages: [
+              {
+                key: event.id.toString(),
+                value: JSON.stringify(event), // you can send the raw DB row
+              },
+            ],
+          });
+
+
+          console.warn(`⚠️ Event ${event.id} sent to dead-letter queue`);
+        } catch (dlqErr) {
+          console.error(`❌ Failed to send to DLQ for event ${event.id}:`, dlqErr.message);
+        }
       }
     }
 
-    client.release();
+    dbClient.release();
   } catch (err) {
     console.error('❌ Error polling outbox:', err.message);
   }

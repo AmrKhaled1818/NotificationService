@@ -1,39 +1,40 @@
 import { Kafka } from 'kafkajs';
 
 const kafka = new Kafka({
-  clientId: 'notification-consumer',
+  clientId: 'dead-letter-consumer',
   brokers: ['localhost:9092'],
 });
 
-const consumer = kafka.consumer({ groupId: 'notification-group' });
+const consumer = kafka.consumer({ groupId: 'dlq-consumer-group' });
 
 async function startConsumer() {
   await consumer.connect();
-  console.log('✅ Kafka consumer connected');
+  console.log('✅ DLQ Consumer connected');
 
-  await consumer.subscribe({ topic: 'notification-topic', fromBeginning: true });
+  await consumer.subscribe({ topic: 'notification-dead-letter', fromBeginning: true });
 
   await consumer.run({
     eachMessage: async ({ topic, partition, message }) => {
       const value = message.value.toString();
-      const payload = JSON.parse(value);
+      console.log('💥 Received message from DLQ:', value);
 
-      console.log(`📥 Received message on ${topic}:`);
-      console.log(`→ Recipient: ${payload.recipient}`);
-      console.log(`→ Channel: ${payload.channel}`);
-      console.log(`→ Message: ${payload.message}`);
-      console.log(`→ Timestamp: ${payload.createdAt}`);
-
-      // You can later integrate real SMS/email logic here
+      // You can parse it if it's JSON
+      try {
+        const payload = JSON.parse(value);
+        console.log(`→ Type: ${payload.type}`);
+        console.log(`→ To: ${payload.to}`);
+        console.log(`→ Message: ${payload.message}`);
+      } catch (e) {
+        console.warn('⚠️ Could not parse message as JSON');
+      }
     },
   });
 }
 
 startConsumer().catch(console.error);
 
-// Graceful shutdown
 process.on('SIGINT', async () => {
   await consumer.disconnect();
-  console.log("👋 Kafka consumer disconnected");
+  console.log("👋 DLQ Kafka consumer disconnected");
   process.exit(0);
 });
