@@ -1,18 +1,26 @@
 {
   "name": "notification-system",
   "version": "1.0.0",
+  "type": "module",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dlq-test": "node dlq-test.js",
+    "dlq-send": "node dlq-test.js send",
+    "dlq-status": "node dlq-test.js status",
+    "start": "node index.js",
+    "start:consumer": "node consumer/consumer.js",
+    "start:dlq-consumer": "node consumer/dlq-consumer.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
   "dependencies": {
     "express": "^5.1.0",
+    "k6-html-reporter": "^1.0.5",
     "kafkajs": "^2.2.4",
     "pg": "^8.16.3",
     "prom-client": "^15.1.3"
-  }
+  },
+  "description": ""
 }

@@ -39,6 +39,41 @@ services:
       - DB_NAME=testdb
     restart: unless-stopped
 
+  notification-consumer:
+    build:
+      context: .
+      dockerfile: consumer/Dockerfile
+    working_dir: /app
+    depends_on:
+      - kafka
+      - postgres
+    environment:
+      - NODE_ENV=development
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASS=pass
+      - DB_NAME=testdb
+    restart: unless-stopped
+
+  dlq-consumer:
+    build:
+      context: .
+      dockerfile: consumer/Dockerfile
+    working_dir: /app
+    command: ["node", "consumer/dlq-consumer.js"]
+    depends_on:
+      - kafka
+      - postgres
+    environment:
+      - NODE_ENV=development
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASS=pass
+      - DB_NAME=testdb
+    restart: unless-stopped
+
   zookeeper:
     image: wurstmeister/zookeeper
     ports:
@@ -53,6 +88,7 @@ services:
       KAFKA_ADVERTISED_HOST_NAME: kafka
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_CREATE_TOPICS: "notification-topic:1:1,notification-dlq:1:1"
     depends_on:
       - zookeeper
     restart: unless-stopped

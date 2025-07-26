@@ -95,6 +95,11 @@ const pollOutbox = async () => {
   }
 };
 
+// Health endpoint
+app.get('/health', (req, res) => {
+  res.json({ status: 'Outbox Worker Running' });
+});
+
 // Metrics endpoint
 app.get('/metrics', async (req, res) => {
   res.set('Content-Type', client.register.contentType);

@@ -1,0 +1,29 @@
+{
+  "name": "notification-consumer",
+  "version": "1.0.0",
+  "description": "Kafka consumer for notification processing with DLQ support",
+  "main": "consumer.js",
+  "type": "module",
+  "scripts": {
+    "start": "node consumer.js",
+    "start:dlq": "node dlq-consumer.js",
+    "dev": "nodemon consumer.js",
+    "dev:dlq": "nodemon dlq-consumer.js"
+  },
+  "dependencies": {
+    "kafkajs": "^2.2.4",
+    "pg": "^8.8.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20"
+  },
+  "keywords": [
+    "kafka",
+    "consumer",
+    "notification",
+    "dlq",
+    "dead-letter-queue"
+  ],
+  "author": "",
+  "license": "ISC"
+} 
