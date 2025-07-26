@@ -29,7 +29,7 @@ const processingDurationHistogram = new client.Histogram({
 });
 
 const kafka = new Kafka({
-  clientId: 'notification-consumer',
+  clientId: 'dead-letter-consumer',
   brokers: ['localhost:9092'],
 });
 
@@ -152,7 +152,6 @@ async function startConsumer() {
 
 startConsumer().catch(console.error);
 
-// Graceful shutdown
 process.on('SIGINT', async () => {
   await consumer.disconnect();
   await producer.disconnect();

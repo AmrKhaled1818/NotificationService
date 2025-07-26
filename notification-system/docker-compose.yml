@@ -125,5 +125,17 @@ services:
       - prometheus
     restart: unless-stopped
 
+  dead-letter-consumer:
+    build:
+      context: .
+      dockerfile: ./outbox-worker/Dockerfile
+    container_name: notification-system-dlq-consumer
+    depends_on:
+      - kafka
+    environment:
+      KAFKA_BROKER: kafka:9092
+    command: node deadLetterConsumer.js
+
+
 volumes:
   postgres_data:

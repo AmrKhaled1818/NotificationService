@@ -10,6 +10,7 @@ COPY outbox-worker/kafkaProducer.js ./
 COPY outbox-worker/outbox.entity.js ./
 COPY outbox-worker/worker.js ./
 COPY common/ ./common/
+COPY outbox-worker/deadLetterConsumer.js ./
 
 EXPOSE 8081
 
