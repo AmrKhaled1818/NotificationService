@@ -2,6 +2,7 @@ import { Kafka } from 'kafkajs';
 import pg from 'pg';
 import { shouldAutoRetry, retryMessage } from '../common/dlq-service.js';
 import env from '../common/config/validateEnv.js';
+import fetch from 'node-fetch';
 
 const kafka = new Kafka({
   clientId: env.KAFKA_CLIENT_ID,
@@ -34,6 +35,23 @@ async function processDLQMessage(dlqPayload, messageKey) {
   console.log(`→ Failed At: ${dlqPayload.failedAt}`);
   console.log(`→ Error: ${dlqPayload.error}`);
   console.log(`→ Retry Count: ${dlqPayload.retryCount}`);
+
+  // Send a webhook alert for every message that hits the DLQ
+  try {
+    const webhookPayload = {
+      event: "EmailSendFailure",
+      to: dlqPayload.originalMessage.recipient,
+      message: `Failed to send after ${dlqPayload.retryCount} retries. Error: ${dlqPayload.error}`
+    };
+    await fetch(env.NOTIFICATION_WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(webhookPayload),
+    });
+    console.log('📡 Webhook alert sent for DLQ message.');
+  } catch (webhookError) {
+    console.error('⚠️ Failed to send webhook alert:', webhookError.message);
+  }
 
   // Check if this message should be auto-retried
   if (shouldAutoRetry(dlqPayload)) {
