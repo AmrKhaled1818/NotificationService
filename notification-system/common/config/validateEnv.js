@@ -22,6 +22,9 @@ const envSchema = z.object({
   DB_USER: z.string().default('postgres'),
   DB_PASS: z.string().default('pass'),
   DB_NAME: z.string().default('testdb'),
+
+  // Webhook for email failure alerts
+  NOTIFICATION_WEBHOOK_URL: z.string().url().optional(), // You can make it required if preferred
 });
 
 const env = envSchema.parse(process.env);
