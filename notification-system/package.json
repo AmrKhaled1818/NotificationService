@@ -5,12 +5,14 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dlq-test": "node dlq-test.js",
-    "dlq-send": "node dlq-test.js send",
-    "dlq-status": "node dlq-test.js status",
-    "start": "node index.js",
+    "dlq-test": "node load-test/dlq-test.js",
+    "dlq-send": "node load-test/dlq-test.js send",
+    "dlq-status": "node load-test/dlq-test.js status",
+    "start": "node load-test/index.js",
     "start:consumer": "node consumer/consumer.js",
-    "start:dlq-consumer": "node consumer/dlq-consumer.js"
+    "start:dlq-consumer": "node consumer/dlq-consumer.js",
+    "generate-report": "node load-test/generate-report.js",
+    "load-test": "node load-test/loadtest.js"
   },
   "keywords": [],
   "author": "",
