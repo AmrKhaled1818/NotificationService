@@ -1,10 +1,11 @@
 import { Kafka } from 'kafkajs';
 import pg from 'pg';
 import { shouldAutoRetry, retryMessage } from '../common/dlq-service.js';
+import env from '../common/config/validateEnv.js';
 
 const kafka = new Kafka({
-  clientId: 'dlq-consumer',
-  brokers: ['localhost:9092'],
+  clientId: env.KAFKA_CLIENT_ID,
+  brokers: [env.KAFKA_BROKER],
 });
 
 const consumer = kafka.consumer({ groupId: 'dlq-group' });
@@ -12,11 +13,11 @@ const producer = kafka.producer();
 
 // PostgreSQL setup
 const pool = new pg.Pool({
-  user: 'postgres',
-  host: 'postgres',
-  database: 'testdb',
-  password: 'pass',
-  port: 5432,
+  user: env.DB_USER,
+  host: env.DB_HOST,
+  database: env.DB_NAME,
+  password: env.DB_PASS,
+  port: parseInt(env.DB_PORT),
 });
 
 // Configuration

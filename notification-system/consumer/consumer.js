@@ -69,9 +69,9 @@ async function processNotification(payload) {
     console.log(`🔄 Processing notification for ${payload.recipient} via ${payload.channel}`);
     
     // Simulate random failures for demonstration
-    // if (Math.random() < 0.3) { // 30% failure rate for testing
-    //   throw new Error('Simulated processing failure');
-    // }
+    if (Math.random() < 0.3) { // 30% failure rate for testing
+      throw new Error('Simulated processing failure');
+    }
     
     // Here you would integrate real SMS/email logic
     console.log(`✅ Successfully processed notification for ${payload.recipient}`);

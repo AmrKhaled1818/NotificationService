@@ -158,25 +158,26 @@ export async function storeDLQRecord(message, error, retryCount) {
 
 // Send message to dead letter queue
 export async function sendToDLQ(originalMessage, error, retryCount, producer) {
+  const originalPayload = JSON.parse(originalMessage.value.toString());
   const dlqPayload = {
-    originalMessage: JSON.parse(originalMessage.value.toString()),
+    originalMessage: originalPayload,
     error: error.message,
     retryCount: retryCount,
     failedAt: new Date().toISOString(),
-    originalTopic: originalMessage.topic,
-    originalPartition: originalMessage.partition,
-    originalOffset: originalMessage.offset
+    originalTopic: originalMessage.topic || 'notification-topic',
+    originalPartition: originalMessage.partition || 0,
+    originalOffset: originalMessage.offset || 0
   };
 
   await producer.send({
     topic: CONFIG.DLQ_TOPIC,
     messages: [{
-      key: originalMessage.key,
+      key: originalMessage.key?.toString() || null,
       value: JSON.stringify(dlqPayload),
       headers: {
         'error-reason': error.message,
         'retry-count': retryCount.toString(),
-        'original-topic': originalMessage.topic
+        'original-topic': originalMessage.topic || 'notification-topic'
       }
     }]
   });

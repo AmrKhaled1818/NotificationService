@@ -2,6 +2,7 @@ import './common/config/validateEnv.js';
 import express from 'express';
 import notifyRoute from './routes/notify.js';
 import dlqAdminRoute from './routes/dlq-admin.js';
+import webhookTestRoute from './routes/webhook-test.js';
 import client from 'prom-client';
 import { getDLQStats } from './common/dlq-service.js';
 import env from './common/config/validateEnv.js';
@@ -41,6 +42,9 @@ app.get('/notify', (req, res) => {
 
 // Route: /admin/dlq - Dead Letter Queue management
 app.use('/admin/dlq', dlqAdminRoute);
+
+// Route: /webhook - Webhook testing endpoints
+app.use('/webhook', webhookTestRoute);
 
 // Simple test endpoint for DLQ
 app.get('/test-dlq', async (req, res) => {
