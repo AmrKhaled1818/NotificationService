@@ -2,6 +2,7 @@ import { Kafka } from 'kafkajs';
 import pg from 'pg';
 import client from 'prom-client';
 import { sendToDLQ, storeDLQRecord } from '../common/dlq-service.js';
+import env from '../common/config/validateEnv.js';
 
 // Prometheus metrics
 const processedMessagesCounter = new client.Counter({
@@ -28,9 +29,16 @@ const processingDurationHistogram = new client.Histogram({
   buckets: [0.1, 0.5, 1, 2, 5, 10]
 });
 
+console.log('🔧 Environment configuration:', {
+  KAFKA_CLIENT_ID: env.KAFKA_CLIENT_ID,
+  KAFKA_BROKER: env.KAFKA_BROKER,
+  DB_HOST: env.DB_HOST,
+  DB_PORT: env.DB_PORT
+});
+
 const kafka = new Kafka({
-  clientId: 'dead-letter-consumer',
-  brokers: ['localhost:9092'],
+  clientId: env.KAFKA_CLIENT_ID,
+  brokers: [env.KAFKA_BROKER],
 });
 
 const consumer = kafka.consumer({ groupId: 'notification-group' });
@@ -38,11 +46,11 @@ const producer = kafka.producer();
 
 // PostgreSQL setup for DLQ tracking
 const pool = new pg.Pool({
-  user: 'postgres',
-  host: 'postgres',
-  database: 'testdb',
-  password: 'pass',
-  port: 5432,
+  user: env.DB_USER,
+  host: env.DB_HOST,
+  database: env.DB_NAME,
+  password: env.DB_PASS,
+  port: parseInt(env.DB_PORT),
 });
 
 // Configuration
@@ -61,9 +69,9 @@ async function processNotification(payload) {
     console.log(`🔄 Processing notification for ${payload.recipient} via ${payload.channel}`);
     
     // Simulate random failures for demonstration
-    if (Math.random() < 0.3) { // 30% failure rate for testing
-      throw new Error('Simulated processing failure');
-    }
+    // if (Math.random() < 0.3) { // 30% failure rate for testing
+    //   throw new Error('Simulated processing failure');
+    // }
     
     // Here you would integrate real SMS/email logic
     console.log(`✅ Successfully processed notification for ${payload.recipient}`);

@@ -11,8 +11,10 @@
     "dev:dlq": "nodemon dlq-consumer.js"
   },
   "dependencies": {
+    "dotenv": "^17.2.1",
     "kafkajs": "^2.2.4",
-    "pg": "^8.8.0"
+    "pg": "^8.8.0",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "nodemon": "^2.0.20"

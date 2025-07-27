@@ -1,6 +1,5 @@
-const { Kafka } = require('kafkajs');
-import { validateEnv } from '../common/config/validateEnv.js';
-import './common/config/validateEnv.js';
+import { Kafka } from 'kafkajs';
+import env from '../common/config/validateEnv.js';
 
 const kafka = new Kafka({
   clientId: 'dead-letter-consumer',
