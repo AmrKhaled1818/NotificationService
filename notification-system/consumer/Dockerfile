@@ -12,6 +12,7 @@ RUN cd consumer && npm install
 
 # Copy source code
 COPY . .
+COPY common/ ./common/
 
 # Default command (can be overridden in docker-compose)
 CMD ["node", "consumer/consumer.js"] 

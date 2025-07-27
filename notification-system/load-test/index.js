@@ -2,6 +2,9 @@ import express from 'express';
 import client from 'prom-client';
 import pg from 'pg';
 import { Kafka } from 'kafkajs';
+import env from './common/config/validateEnv.js';
+import './common/config/validateEnv.js';
+
 
 const app = express();
 const PORT = process.env.PORT || 8081;
