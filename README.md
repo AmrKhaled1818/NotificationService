@@ -1,6 +1,6 @@
-# Notification System
+# Distributed Notification System
 
-A robust, scalable notification system built with Node.js, featuring microservices architecture, message queuing, dead letter queue handling, and comprehensive monitoring capabilities.
+A distributed notification system built with Node.js microservices, implementing the Outbox Pattern for reliable message delivery across multiple channels including email and webhooks.
 
 ## Overview
 
