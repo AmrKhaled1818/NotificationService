@@ -1,12 +1,10 @@
-import './common/config/validateEnv.js';
+import '../common/config/validateEnv.js';
 import express from 'express';
 import notifyRoute from './routes/notify.js';
 import dlqAdminRoute from './routes/dlq-admin.js';
 import webhookTestRoute from './routes/webhook-test.js';
 import client from 'prom-client';
-import { getDLQStats } from './common/dlq-service.js';
-import env from './common/config/validateEnv.js';
-
+import { getDLQStats } from '../common/dlq-service.js';
 
 const app = express();
 const PORT = process.env.PORT || 8080;
